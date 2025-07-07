@@ -15,10 +15,10 @@ const Index = () => {
           {/* Header with enhanced animations */}
           <div className="text-center mb-8 animate-fade-in">
             <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg transform hover:scale-105 transition-all duration-500 animate-bounce">
-              QuizMaster Pro
+              Dalwa QuizMaster Pro
             </h1>
             <p className="text-xl text-blue-100 mb-8 animate-fade-in" style={{animationDelay: '0.5s'}}>
-              Test your knowledge with our interactive quiz!
+              Test your knowledge with our interactive quiz powered by Dalwa!
             </p>
             {/* Powered by Dalwa branding */}
             <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 animate-pulse">
@@ -29,20 +29,28 @@ const Index = () => {
           </div>
 
           {/* Quiz Container with enhanced styling */}
-          <div id="quiz-container" className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 mb-8 transform hover:scale-[1.02] transition-all duration-500 animate-scale-in">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 mb-8 transform hover:scale-[1.02] transition-all duration-500 animate-scale-in">
             {/* Welcome Screen */}
             <div id="welcome-screen" className="text-center">
               <div className="animate-bounce mb-6">
                 <div className="text-8xl mb-4">🧠</div>
               </div>
               <h2 className="text-3xl font-bold text-gray-800 mb-6 animate-fade-in">
-                Welcome to the Quiz!
+                Welcome to Dalwa Quiz!
               </h2>
               <p className="text-lg text-gray-600 mb-8 animate-fade-in" style={{animationDelay: '0.3s'}}>
                 Answer 10 questions and test your general knowledge. Each correct answer is worth 10 points.
               </p>
               <button 
-                id="start-quiz-btn"
+                onClick={() => {
+                  document.getElementById('welcome-screen').style.animation = 'fade-out 0.5s ease-out forwards';
+                  setTimeout(() => {
+                    document.getElementById('welcome-screen').classList.add('hidden');
+                    document.getElementById('quiz-screen').classList.remove('hidden');
+                    document.getElementById('quiz-screen').style.animation = 'fade-in 0.5s ease-out forwards';
+                    loadQuestion();
+                  }, 500);
+                }}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transform hover:scale-110 transition-all duration-300 shadow-lg animate-pulse hover:animate-none relative overflow-hidden group"
               >
                 <span className="relative z-10">Start Quiz</span>
@@ -92,6 +100,7 @@ const Index = () => {
               <div className="text-center animate-fade-in">
                 <button 
                   id="next-btn"
+                  onClick={() => nextQuestion()}
                   className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:from-green-600 hover:to-emerald-700 transform hover:scale-110 hover:rotate-2 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:rotate-0 relative overflow-hidden group"
                   disabled
                 >
@@ -110,7 +119,7 @@ const Index = () => {
                   <span id="final-score" className="inline-block transform hover:scale-110 transition-transform duration-300">0</span>/100
                 </div>
                 <p id="results-message" className="text-xl text-gray-600 mb-8 animate-fade-in" style={{animationDelay: '0.5s'}}>
-                  Great job! You've completed the quiz.
+                  Great job! You've completed the Dalwa quiz.
                 </p>
               </div>
               
@@ -130,7 +139,12 @@ const Index = () => {
               </div>
 
               <button 
-                id="restart-btn"
+                onClick={() => {
+                  document.getElementById('results-screen').style.animation = 'fade-out 0.5s ease-out forwards';
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 500);
+                }}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transform hover:scale-110 hover:-rotate-2 transition-all duration-300 shadow-lg animate-pulse hover:animate-none relative overflow-hidden group"
               >
                 <span className="relative z-10">Take Quiz Again</span>
@@ -158,7 +172,7 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Enhanced Quiz JavaScript */}
+      {/* Add JavaScript functionality */}
       <script dangerouslySetInnerHTML={{
         __html: `
           // Quiz Data
@@ -222,209 +236,85 @@ const Index = () => {
           let correctAnswers = 0;
           let incorrectAnswers = 0;
 
-          // DOM Elements
-          const welcomeScreen = document.getElementById('welcome-screen');
-          const quizScreen = document.getElementById('quiz-screen');
-          const resultsScreen = document.getElementById('results-screen');
-          const startBtn = document.getElementById('start-quiz-btn');
-          const nextBtn = document.getElementById('next-btn');
-          const restartBtn = document.getElementById('restart-btn');
-          const questionText = document.getElementById('question-text');
-          const answerOptions = document.getElementById('answer-options');
-          const progressBar = document.getElementById('progress-bar');
-          const questionCounter = document.getElementById('question-counter');
-          const currentScoreElement = document.getElementById('current-score');
-          const finalScoreElement = document.getElementById('final-score');
-          const resultsMessage = document.getElementById('results-message');
-          const resultsIcon = document.getElementById('results-icon');
-          const correctAnswersElement = document.getElementById('correct-answers');
-          const incorrectAnswersElement = document.getElementById('incorrect-answers');
-
-          // Event Listeners
-          startBtn.addEventListener('click', startQuiz);
-          nextBtn.addEventListener('click', nextQuestion);
-          restartBtn.addEventListener('click', restartQuiz);
-
-          function startQuiz() {
-            // Add exit animation to welcome screen
-            welcomeScreen.style.animation = 'fade-out 0.5s ease-out forwards';
-            setTimeout(() => {
-              welcomeScreen.classList.add('hidden');
-              quizScreen.classList.remove('hidden');
-              quizScreen.style.animation = 'fade-in 0.5s ease-out forwards';
-              loadQuestion();
-            }, 500);
-          }
-
-          function loadQuestion() {
+          window.loadQuestion = function() {
             const question = quizData[currentQuestion];
             
-            // Animate question text
-            questionText.style.animation = 'fade-in 0.5s ease-out forwards';
-            questionText.textContent = question.question;
+            document.getElementById('question-text').textContent = question.question;
             
-            // Update progress with animation
             const progress = ((currentQuestion + 1) / quizData.length) * 100;
-            progressBar.style.width = progress + '%';
-            questionCounter.textContent = (currentQuestion + 1) + ' / ' + quizData.length;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('question-counter').textContent = (currentQuestion + 1) + ' / ' + quizData.length;
             
-            // Clear previous options
+            const answerOptions = document.getElementById('answer-options');
             answerOptions.innerHTML = '';
             selectedAnswer = null;
-            nextBtn.disabled = true;
+            document.getElementById('next-btn').disabled = true;
             
-            // Create answer options with staggered animation
             question.options.forEach((option, index) => {
               const button = document.createElement('button');
-              button.className = 'w-full p-4 text-left border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg animate-fade-in opacity-0';
-              button.style.animationDelay = (index * 0.1) + 's';
-              button.style.animationFillMode = 'forwards';
+              button.className = 'w-full p-4 text-left border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg';
               button.textContent = option;
-              button.addEventListener('click', () => selectAnswer(index, button));
+              button.addEventListener('click', () => {
+                const allButtons = answerOptions.querySelectorAll('button');
+                allButtons.forEach(btn => {
+                  btn.classList.remove('border-purple-500', 'bg-purple-100', 'text-purple-700');
+                  btn.classList.add('border-gray-200');
+                });
+                
+                button.classList.remove('border-gray-200');
+                button.classList.add('border-purple-500', 'bg-purple-100', 'text-purple-700');
+                
+                selectedAnswer = index;
+                document.getElementById('next-btn').disabled = false;
+              });
               answerOptions.appendChild(button);
             });
-          }
+          };
 
-          function selectAnswer(answerIndex, buttonElement) {
-            // Remove previous selection with animation
-            const allButtons = answerOptions.querySelectorAll('button');
-            allButtons.forEach(btn => {
-              btn.classList.remove('border-purple-500', 'bg-purple-100', 'text-purple-700', 'scale-105');
-              btn.classList.add('border-gray-200');
-              btn.style.transform = 'scale(1)';
-            });
-            
-            // Highlight selected answer with enhanced animation
-            buttonElement.style.animation = 'scale-in 0.3s ease-out forwards';
-            buttonElement.classList.remove('border-gray-200');
-            buttonElement.classList.add('border-purple-500', 'bg-purple-100', 'text-purple-700');
-            buttonElement.style.transform = 'scale(1.05)';
-            
-            selectedAnswer = answerIndex;
-            nextBtn.disabled = false;
-            
-            // Animate next button
-            nextBtn.style.animation = 'bounce 0.5s ease-out';
-          }
-
-          function nextQuestion() {
-            // Check if answer is correct with animation feedback
+          window.nextQuestion = function() {
             const correct = quizData[currentQuestion].correct;
             if (selectedAnswer === correct) {
               score += 10;
               correctAnswers++;
-              currentScoreElement.textContent = score;
-              currentScoreElement.style.animation = 'bounce 0.5s ease-out';
-              currentScoreElement.style.color = '#10b981';
-              setTimeout(() => {
-                currentScoreElement.style.color = '#7c3aed';
-              }, 1000);
+              document.getElementById('current-score').textContent = score;
             } else {
               incorrectAnswers++;
-              currentScoreElement.style.animation = 'shake 0.5s ease-out';
             }
             
             currentQuestion++;
             
             if (currentQuestion < quizData.length) {
-              // Animate transition to next question
-              const questionContainer = document.querySelector('#quiz-screen > div:nth-child(3)');
-              questionContainer.style.animation = 'fade-out 0.3s ease-out forwards';
-              setTimeout(() => {
-                loadQuestion();
-                questionContainer.style.animation = 'fade-in 0.5s ease-out forwards';
-              }, 300);
+              loadQuestion();
             } else {
-              showResults();
+              document.getElementById('quiz-screen').classList.add('hidden');
+              document.getElementById('results-screen').classList.remove('hidden');
+              
+              document.getElementById('final-score').textContent = score;
+              document.getElementById('correct-answers').textContent = correctAnswers;
+              document.getElementById('incorrect-answers').textContent = incorrectAnswers;
+              
+              const resultsMessage = document.getElementById('results-message');
+              const resultsIcon = document.getElementById('results-icon');
+              
+              if (score >= 80) {
+                resultsMessage.textContent = "Excellent! You're a Dalwa quiz master!";
+                resultsIcon.textContent = "🏆";
+              } else if (score >= 60) {
+                resultsMessage.textContent = "Good job! Well done on the Dalwa quiz!";
+                resultsIcon.textContent = "🎉";
+              } else if (score >= 40) {
+                resultsMessage.textContent = "Not bad! Keep learning with Dalwa!";
+                resultsIcon.textContent = "👍";
+              } else {
+                resultsMessage.textContent = "Keep practicing! Dalwa believes in you!";
+                resultsIcon.textContent = "📚";
+              }
             }
-          }
-
-          function showResults() {
-            // Animate transition to results
-            quizScreen.style.animation = 'fade-out 0.5s ease-out forwards';
-            setTimeout(() => {
-              quizScreen.classList.add('hidden');
-              resultsScreen.classList.remove('hidden');
-              resultsScreen.style.animation = 'scale-in 0.5s ease-out forwards';
-              
-              finalScoreElement.textContent = score;
-              correctAnswersElement.textContent = correctAnswers;
-              incorrectAnswersElement.textContent = incorrectAnswers;
-              
-              // Animate score counting
-              let currentDisplayScore = 0;
-              const scoreInterval = setInterval(() => {
-                currentDisplayScore += 5;
-                finalScoreElement.textContent = Math.min(currentDisplayScore, score);
-                if (currentDisplayScore >= score) {
-                  clearInterval(scoreInterval);
-                  finalScoreElement.style.animation = 'bounce 0.5s ease-out';
-                }
-              }, 50);
-              
-              // Set results message and icon based on score with animation
-              setTimeout(() => {
-                if (score >= 80) {
-                  resultsMessage.textContent = "Excellent! You're a quiz master!";
-                  resultsIcon.textContent = "🏆";
-                  resultsIcon.style.animation = 'bounce 1s ease-out infinite';
-                } else if (score >= 60) {
-                  resultsMessage.textContent = "Good job! Well done!";
-                  resultsIcon.textContent = "🎉";
-                  resultsIcon.style.animation = 'pulse 1s ease-out infinite';
-                } else if (score >= 40) {
-                  resultsMessage.textContent = "Not bad! Keep learning!";
-                  resultsIcon.textContent = "👍";
-                  resultsIcon.style.animation = 'bounce 1s ease-out infinite';
-                } else {
-                  resultsMessage.textContent = "Keep practicing! You'll do better next time!";
-                  resultsIcon.textContent = "📚";
-                  resultsIcon.style.animation = 'pulse 1s ease-out infinite';
-                }
-              }, 1000);
-            }, 500);
-          }
-
-          function restartQuiz() {
-            // Reset with animation
-            resultsScreen.style.animation = 'fade-out 0.5s ease-out forwards';
-            setTimeout(() => {
-              currentQuestion = 0;
-              score = 0;
-              selectedAnswer = null;
-              correctAnswers = 0;
-              incorrectAnswers = 0;
-              
-              currentScoreElement.textContent = '0';
-              currentScoreElement.style.color = '#7c3aed';
-              
-              resultsScreen.classList.add('hidden');
-              welcomeScreen.classList.remove('hidden');
-              welcomeScreen.style.animation = 'scale-in 0.5s ease-out forwards';
-            }, 500);
-          }
+          };
 
           // Add custom CSS animations
           const style = document.createElement('style');
           style.textContent = \`
-            @keyframes shake {
-              0%, 100% { transform: translateX(0); }
-              25% { transform: translateX(-5px); }
-              75% { transform: translateX(5px); }
-            }
-            
-            .animate-fade-in {
-              animation: fade-in 0.5s ease-out forwards;
-            }
-            
-            .animate-scale-in {
-              animation: scale-in 0.5s ease-out forwards;
-            }
-            
-            .animate-slide-in-right {
-              animation: slide-in-right 0.5s ease-out forwards;
-            }
-            
             @keyframes fade-in {
               from { opacity: 0; transform: translateY(20px); }
               to { opacity: 1; transform: translateY(0); }
@@ -443,6 +333,18 @@ const Index = () => {
             @keyframes slide-in-right {
               from { opacity: 0; transform: translateX(30px); }
               to { opacity: 1; transform: translateX(0); }
+            }
+            
+            .animate-fade-in {
+              animation: fade-in 0.5s ease-out forwards;
+            }
+            
+            .animate-scale-in {
+              animation: scale-in 0.5s ease-out forwards;
+            }
+            
+            .animate-slide-in-right {
+              animation: slide-in-right 0.5s ease-out forwards;
             }
           \`;
           document.head.appendChild(style);
